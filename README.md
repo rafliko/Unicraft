@@ -1,2 +1,2 @@
 # Unicraft
-A minecraft clone made in Unity.
+A minecraft clone made with Unity.
