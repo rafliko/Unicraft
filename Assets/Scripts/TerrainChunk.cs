@@ -27,9 +27,6 @@ public class TerrainChunk : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        offsetX = transform.parent.position.x;
-        offsetZ = transform.parent.position.z;
-
         mesh = new Mesh();
 
         FillBlocksArray();
@@ -87,7 +84,7 @@ public class TerrainChunk : MonoBehaviour
 
     void CreateCube(Vector3 pos)
     {
-        if ((int)pos.y < chunkWidth-1 && blocks[(int)pos.x,(int)pos.y + 1,(int)pos.z]==BlockType.Air)
+        if ((int)pos.y < chunkHeight-1 && blocks[(int)pos.x,(int)pos.y + 1,(int)pos.z]==BlockType.Air)
             CreateFace(pos, Face.Top);
 
         if ((int)pos.y > 0 && blocks[(int)pos.x, (int)pos.y - 1, (int)pos.z] == BlockType.Air)
@@ -180,14 +177,4 @@ public class TerrainChunk : MonoBehaviour
         mesh.triangles = triangles.ToArray();
         mesh.uv = uv.ToArray();
     }
-}
-
-public enum Face
-{
-    Top,
-    Bottom,
-    Left,
-    Right,
-    Front,
-    Back
 }

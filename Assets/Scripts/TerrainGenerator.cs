@@ -9,6 +9,8 @@ public class TerrainGenerator : MonoBehaviour
     public GameObject chunk;
     public int renderDistance;
 
+    public static Dictionary<ChunkPos, TerrainChunk> chunks = new Dictionary<ChunkPos, TerrainChunk>();
+
     public static float seed = 10000;
     public const float noiseScale = 0.02f;
     public const int chunkWidth = 16;
@@ -24,7 +26,10 @@ public class TerrainGenerator : MonoBehaviour
         {
             for (int z = -renderDistance; z <= renderDistance; z++)
             {
-                Instantiate(chunk, new Vector3(x*chunkWidth, 0, z*chunkWidth), Quaternion.identity);
+                var obj = Instantiate(chunk, new Vector3(x*chunkWidth, 0, z*chunkWidth), Quaternion.identity).transform.GetChild(0);
+                obj.GetComponent<TerrainChunk>().offsetX = x*chunkWidth;
+                obj.GetComponent<TerrainChunk>().offsetZ = z * chunkWidth;
+                chunks.Add(new ChunkPos(x*chunkWidth,z*chunkWidth), obj.GetComponent<TerrainChunk>());
             }
         }
     }
@@ -32,6 +37,6 @@ public class TerrainGenerator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 }

@@ -11,10 +11,6 @@ public class MouseLook : MonoBehaviour
 
     float xRotation = 0f;
 
-    RaycastHit hit;
-
-    public LayerMask groundMask;
-
     // Start is called before the first frame update
     void Start()
     {
@@ -26,42 +22,6 @@ public class MouseLook : MonoBehaviour
     {
         float mouseX = Input.GetAxis("Mouse X") * sensitivity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * sensitivity * Time.deltaTime;
-
-        if(Input.GetMouseButtonDown(0))
-        {
-            if(Physics.Raycast(transform.position, transform.forward, out hit, 5, groundMask))
-            {
-                Debug.DrawRay(transform.position, transform.forward * hit.distance, Color.yellow);
-
-                hit.point = hit.point + transform.forward * 0.01f;
-
-                var chunk = hit.transform.gameObject.GetComponent<TerrainChunk>();
-                int x = (int)Mathf.Floor(hit.point.x) - (int)chunk.offsetX;
-                int y = (int)Mathf.Floor(hit.point.y);
-                int z = (int)Mathf.Floor(hit.point.z) - (int)chunk.offsetZ;
-                Debug.Log(x+","+y+","+z);
-                chunk.blocks[x, y, z] = BlockType.Air;
-                chunk.UpdateChunk();
-            }
-        }
-
-        if (Input.GetMouseButtonDown(1))
-        {
-            if (Physics.Raycast(transform.position, transform.forward, out hit, 5, groundMask))
-            {
-                Debug.DrawRay(transform.position, transform.forward * hit.distance, Color.yellow);
-
-                hit.point = hit.point - transform.forward * 0.01f;
-
-                var chunk = hit.transform.gameObject.GetComponent<TerrainChunk>();
-                int x = (int)Mathf.Floor(hit.point.x) - (int)chunk.offsetX;
-                int y = (int)Mathf.Floor(hit.point.y);
-                int z = (int)Mathf.Floor(hit.point.z) - (int)chunk.offsetZ;
-                Debug.Log(x + "," + y + "," + z);
-                chunk.blocks[x, y, z] = BlockType.Grass;
-                chunk.UpdateChunk();
-            }
-        }
 
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
