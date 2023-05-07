@@ -12,59 +12,21 @@ public class TerrainChunk : MonoBehaviour
     List<Vector2> uv = new List<Vector2>();
     int numFaces = 0;
 
-    float seed = TerrainGenerator.seed;
-    const float noiseScale = TerrainGenerator.noiseScale;
     const int chunkWidth = TerrainGenerator.chunkWidth;
     const int chunkHeight = TerrainGenerator.chunkHeight;
 
     public BlockType[,,] blocks = new BlockType[chunkWidth+2, chunkHeight, chunkWidth+2];
 
-    public float offsetX;
-    public float offsetZ;
-
     // Start is called before the first frame update
     void Start()
     {
-        mesh = new Mesh();
 
-        FillBlocksArray();
-        UpdateChunk();
     }
 
     // Update is called once per frame
     void Update()
     {
         
-    }
-
-    void FillBlocksArray()
-    {
-        for (int x = 0; x < chunkWidth + 2; x++)
-        {
-            for (int z = 0; z < chunkWidth + 2; z++)
-            {
-                float pn = Mathf.PerlinNoise((x + offsetX + seed) * noiseScale, (z + offsetZ + seed) * noiseScale) * chunkHeight / 4;
-                if ((int)pn <= 0) pn = 1;
-                for (int y = 0; y < (int)pn; y++)
-                {
-                    blocks[x, y, z] = BlockType.Grass;
-                }
-            }
-        }
-    }
-
-    void ReadBlocksArray()
-    {
-        for (int x = 1; x < chunkWidth + 1; x++)
-        {
-            for (int z = 1; z < chunkWidth + 1; z++)
-            {
-                for (int y = 0; y < chunkHeight; y++)
-                {
-                    if (blocks[x, y, z] == BlockType.Grass) CreateCube(new Vector3(x, y, z));
-                }
-            }
-        }
     }
 
     public void UpdateChunk()
@@ -74,34 +36,90 @@ public class TerrainChunk : MonoBehaviour
         uv.Clear();
         numFaces = 0;
 
-        ReadBlocksArray();
+        CreateCubes();
         UpdateMesh();
         GetComponent<MeshFilter>().mesh = mesh;
         GetComponent<MeshCollider>().sharedMesh = mesh;
     }
 
-    void CreateCube(Vector3 pos)
+    void CreateCubes()
     {
-        if ((int)pos.y < chunkHeight-1 && blocks[(int)pos.x,(int)pos.y + 1,(int)pos.z]==BlockType.Air)
-            CreateFace(pos, Face.Top);
-
-        if ((int)pos.y > 0 && blocks[(int)pos.x, (int)pos.y - 1, (int)pos.z] == BlockType.Air)
-            CreateFace(pos, Face.Bottom);
-
-        if (blocks[(int)pos.x + 1, (int)pos.y, (int)pos.z] == BlockType.Air)
-            CreateFace(pos, Face.Right);
-
-        if (blocks[(int)pos.x - 1, (int)pos.y, (int)pos.z] == BlockType.Air)
-            CreateFace(pos, Face.Left);
-
-        if (blocks[(int)pos.x, (int)pos.y, (int)pos.z + 1] == BlockType.Air)
-            CreateFace(pos, Face.Back);
-
-        if (blocks[(int)pos.x, (int)pos.y, (int)pos.z - 1] == BlockType.Air)
-            CreateFace(pos, Face.Front);
+        for (int x = 1; x < chunkWidth + 1; x++)
+        {
+            for (int z = 1; z < chunkWidth + 1; z++)
+            {
+                for (int y = 0; y < chunkHeight; y++)
+                {
+                    if (blocks[x, y, z] != BlockType.Air) CreateCube(new Vector3(x, y, z), blocks[x, y, z]);
+                }
+            }
+        }
     }
 
-    void CreateFace(Vector3 pos, Face f)
+    void CreateCube(Vector3 pos, BlockType block)
+    {
+        Vector2[] uvpos = GetBlockUV(block);
+
+        if ((int)pos.y < chunkHeight-1 && blocks[(int)pos.x,(int)pos.y + 1,(int)pos.z]==BlockType.Air)
+            CreateFace(pos, Face.Top, uvpos);
+
+        if ((int)pos.y > 0 && blocks[(int)pos.x, (int)pos.y - 1, (int)pos.z] == BlockType.Air)
+            CreateFace(pos, Face.Bottom, uvpos);
+
+        if (blocks[(int)pos.x + 1, (int)pos.y, (int)pos.z] == BlockType.Air)
+            CreateFace(pos, Face.Right, uvpos);
+
+        if (blocks[(int)pos.x - 1, (int)pos.y, (int)pos.z] == BlockType.Air)
+            CreateFace(pos, Face.Left, uvpos);
+
+        if (blocks[(int)pos.x, (int)pos.y, (int)pos.z + 1] == BlockType.Air)
+            CreateFace(pos, Face.Back, uvpos);
+
+        if (blocks[(int)pos.x, (int)pos.y, (int)pos.z - 1] == BlockType.Air)
+            CreateFace(pos, Face.Front, uvpos);
+    }
+
+    Vector2[] GetBlockUV(BlockType block)
+    {
+        Vector2[] ret = new Vector2[4];
+
+        switch(block)
+        {
+            case BlockType.Grass:
+                ret = new Vector2[]
+                {
+                    new Vector2 (0f, 1f), //top-left
+                    new Vector2 (0.4f, 1f), //top-right
+                    new Vector2 (0f, 0.6f), //bottom-left
+                    new Vector2 (0.4f, 0.6f), //bottom-right
+                };
+                break;
+
+            case BlockType.Dirt:
+                ret = new Vector2[]
+                {
+                    new Vector2 (0.5f, 1f),
+                    new Vector2 (1f, 1f),
+                    new Vector2 (0.5f, 0.5f),
+                    new Vector2 (1f, 0.5f),
+                };
+                break;
+
+            case BlockType.Stone:
+                ret = new Vector2[]
+                {
+                    new Vector2 (0f, 0.5f),
+                    new Vector2 (0.5f, 0.5f),
+                    new Vector2 (0f, 0f),
+                    new Vector2 (0.5f, 0f),
+                };
+                break;
+        }
+
+        return ret;
+    }
+
+    void CreateFace(Vector3 pos, Face f, Vector2[] uvpos)
     {
         switch(f)
         {
@@ -157,20 +175,14 @@ public class TerrainChunk : MonoBehaviour
             numFaces*4+3, numFaces*4+2, numFaces*4+1,
         });
 
-        uv.AddRange(new Vector2[]
-        {
-            new Vector2 (0, 0),
-            new Vector2 (1, 0),
-            new Vector2 (0, 1),
-            new Vector2 (1, 1),
-        });
+        uv.AddRange(uvpos);
 
         numFaces++;
     }
 
     void UpdateMesh()
     {
-        mesh.Clear();
+        mesh = new Mesh();
         mesh.vertices = vertices.ToArray();
         mesh.triangles = triangles.ToArray();
         mesh.uv = uv.ToArray();

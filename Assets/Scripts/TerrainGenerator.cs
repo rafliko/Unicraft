@@ -31,7 +31,7 @@ public class TerrainGenerator : MonoBehaviour
         {
             for (int z = -renderDistance; z <= renderDistance; z++)
             {
-                CreateChunk(x*chunkWidth, z*chunkWidth);
+                CreateChunk(new ChunkPos(x*chunkWidth, z*chunkWidth));
             }
         }
     }
@@ -51,7 +51,7 @@ public class TerrainGenerator : MonoBehaviour
                 if (chunks.ContainsKey(cp))
                     chunks[cp].gameObject.SetActive(true);
                 else
-                    CreateChunk(cp.x, cp.z);
+                    CreateChunk(cp);
 
                 //unload
                 cp = new ChunkPos(px - (renderDistance + 1) * chunkWidth, pz + z * chunkWidth);
@@ -68,7 +68,7 @@ public class TerrainGenerator : MonoBehaviour
                 if (chunks.ContainsKey(cp))
                     chunks[cp].gameObject.SetActive(true);
                 else
-                    CreateChunk(cp.x, cp.z);
+                    CreateChunk(cp);
 
                 //unload
                 cp = new ChunkPos(px + (renderDistance + 1) * chunkWidth, pz + z * chunkWidth);
@@ -85,7 +85,7 @@ public class TerrainGenerator : MonoBehaviour
                 if (chunks.ContainsKey(cp))
                     chunks[cp].gameObject.SetActive(true);
                 else
-                    CreateChunk(cp.x, cp.z);
+                    CreateChunk(cp);
 
                 //unload
                 cp = new ChunkPos(px + x * chunkWidth, pz - (renderDistance + 1) * chunkWidth);
@@ -102,7 +102,7 @@ public class TerrainGenerator : MonoBehaviour
                 if (chunks.ContainsKey(cp))
                     chunks[cp].gameObject.SetActive(true);
                 else
-                    CreateChunk(cp.x, cp.z);
+                    CreateChunk(cp);
 
                 //unload
                 cp = new ChunkPos(px + x * chunkWidth, pz + (renderDistance + 1) * chunkWidth);
@@ -114,11 +114,28 @@ public class TerrainGenerator : MonoBehaviour
         prevpz = pz;
     }
 
-    void CreateChunk(int x, int z)
+    void CreateChunk(ChunkPos cp)
     {
-        var obj = Instantiate(chunkObj, new Vector3(x, 0, z), Quaternion.identity).transform.GetChild(0);
-        obj.GetComponent<TerrainChunk>().offsetX = x;
-        obj.GetComponent<TerrainChunk>().offsetZ = z;
-        chunks.Add(new ChunkPos(x, z), obj.GetComponent<TerrainChunk>());
+        TerrainChunk tc = Instantiate(chunkObj, new Vector3(cp.x, 0, cp.z), Quaternion.identity).transform.GetChild(0).GetComponent<TerrainChunk>();
+        GenerateTerrain(tc, cp.x, cp.z);
+        tc.UpdateChunk();
+        chunks.Add(cp, tc);
+    }
+
+    void GenerateTerrain(TerrainChunk chunk, int offsetX, int offsetZ)
+    {
+        for (int x = 0; x < chunkWidth + 2; x++)
+        {
+            for (int z = 0; z < chunkWidth + 2; z++)
+            {
+                float pn = Mathf.PerlinNoise((x + offsetX + seed) * noiseScale, (z + offsetZ + seed) * noiseScale) * chunkHeight / 4 + 10;
+                for (int y = 0; y <= (int)pn; y++)
+                {
+                    if (y < 10) chunk.blocks[x, y, z] = BlockType.Stone;
+                    else if (y < 14) chunk.blocks[x, y, z] = BlockType.Dirt;
+                    else chunk.blocks[x, y, z] = BlockType.Grass;
+                }
+            }
+        }
     }
 }

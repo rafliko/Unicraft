@@ -1,5 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
+using TMPro;
 using UnityEngine;
 
 public class TerrainModify : MonoBehaviour
@@ -7,6 +7,9 @@ public class TerrainModify : MonoBehaviour
     RaycastHit hit;
 
     public LayerMask groundMask;
+    public TextMeshProUGUI sbText;
+
+    BlockType selectedBlock = BlockType.Grass;
 
     // Start is called before the first frame update
     void Start()
@@ -36,8 +39,20 @@ public class TerrainModify : MonoBehaviour
                 Debug.DrawRay(transform.position, transform.forward * hit.distance, Color.yellow);
 
                 hit.point = hit.point - transform.forward * 0.01f;
-                AlterChunk(hit.point, BlockType.Grass);
+                AlterChunk(hit.point, selectedBlock);
             }
+        }
+
+        if(Input.mouseScrollDelta.y == 1 && (int)selectedBlock < Enum.GetValues(typeof(BlockType)).Length-1)
+        {
+            selectedBlock = selectedBlock + 1;
+            sbText.text = selectedBlock.ToString();
+        }
+
+        if (Input.mouseScrollDelta.y == -1 && (int)selectedBlock > 1)
+        {
+            selectedBlock = selectedBlock - 1;
+            sbText.text = selectedBlock.ToString();
         }
     }
 
