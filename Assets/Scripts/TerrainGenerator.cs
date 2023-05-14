@@ -16,6 +16,8 @@ public class TerrainGenerator : MonoBehaviour
     public const int chunkWidth = 16;
     public const int chunkHeight = 64;
 
+    public const float stoneScale = 0.05f;
+
     ChunkPos cp;
 
     int prevpx = 0;
@@ -128,12 +130,16 @@ public class TerrainGenerator : MonoBehaviour
         {
             for (int z = 0; z < chunkWidth + 2; z++)
             {
-                float pn = Mathf.PerlinNoise((x + offsetX + seed) * noiseScale, (z + offsetZ + seed) * noiseScale) * chunkHeight / 4 + 10;
-                for (int y = 0; y <= (int)pn; y++)
+                float pn1 = Mathf.PerlinNoise((x + offsetX + seed) * noiseScale, (z + offsetZ + seed) * noiseScale) * chunkHeight / 4 + 10;
+                for (int y = 0; y <= (int)pn1; y++)
                 {
                     if (y < 10) chunk.blocks[x, y, z] = BlockType.Stone;
                     else if (y < 14) chunk.blocks[x, y, z] = BlockType.Dirt;
                     else chunk.blocks[x, y, z] = BlockType.Grass;
+
+                    //random stone
+                    float pn2 = Mathf.PerlinNoise((x + offsetX + seed) * stoneScale, (z + offsetZ + seed) * stoneScale) * chunkHeight / 4 + 10;
+                    if(pn2>20) chunk.blocks[x, y, z] = BlockType.Stone;
                 }
             }
         }
