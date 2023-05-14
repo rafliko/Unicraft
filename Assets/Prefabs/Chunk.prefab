@@ -47,6 +47,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad8730d0ad78d6644841ec8f8f93554c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tex:
+  - {fileID: 2800000, guid: ed0f6d4437cf4b54ca4eeac2684ff42e, type: 3}
+  - {fileID: 2800000, guid: 87843c0b566481747b548a02111cc4eb, type: 3}
+  - {fileID: 2800000, guid: 356d089ad6f4d2448bc50a73822c3116, type: 3}
+  - {fileID: 2800000, guid: 356d089ad6f4d2448bc50a73822c3116, type: 3}
+  - {fileID: 2800000, guid: 356d089ad6f4d2448bc50a73822c3116, type: 3}
+  mat: {fileID: 2100000, guid: 6b9d874eb79093c44a43132b1c4af0fa, type: 2}
 --- !u!33 &4733454928973066565
 MeshFilter:
   m_ObjectHideFlags: 0

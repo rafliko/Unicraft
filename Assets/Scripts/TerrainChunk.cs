@@ -83,38 +83,13 @@ public class TerrainChunk : MonoBehaviour
     {
         Vector2[] ret = new Vector2[4];
 
-        switch(block)
+        ret = new Vector2[]
         {
-            case BlockType.Grass:
-                ret = new Vector2[]
-                {
-                    new Vector2 (0f, 1f), //top-left
-                    new Vector2 (0.4f, 1f), //top-right
-                    new Vector2 (0f, 0.6f), //bottom-left
-                    new Vector2 (0.4f, 0.6f), //bottom-right
-                };
-                break;
-
-            case BlockType.Dirt:
-                ret = new Vector2[]
-                {
-                    new Vector2 (0.5f, 1f),
-                    new Vector2 (1f, 1f),
-                    new Vector2 (0.5f, 0.5f),
-                    new Vector2 (1f, 0.5f),
-                };
-                break;
-
-            case BlockType.Stone:
-                ret = new Vector2[]
-                {
-                    new Vector2 (0f, 0.5f),
-                    new Vector2 (0.5f, 0.5f),
-                    new Vector2 (0f, 0f),
-                    new Vector2 (0.5f, 0f),
-                };
-                break;
-        }
+            new Vector2 (((int)block-1)/10f, 1f), //top-left
+            new Vector2 (((int)block)/10f, 1f), //top-right
+            new Vector2 (((int)block-1)/10f, 0f), //bottom-left
+            new Vector2 (((int)block)/10f, 0f), //bottom-right
+        };
 
         return ret;
     }

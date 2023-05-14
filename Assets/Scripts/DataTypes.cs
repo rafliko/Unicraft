@@ -1,6 +1,6 @@
 public enum BlockType
 {
-    Air, Grass, Dirt, Stone
+    Air, Grass, Dirt, Stone, Test, Bricks
 }
 
 public enum Face
